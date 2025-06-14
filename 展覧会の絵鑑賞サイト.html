@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>組曲「展覧会の絵」鑑賞学習サイト</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        .youtube-embed {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+        }
+        .youtube-embed iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .chat-bubble {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+        }
+        .user-bubble {
+            background-color: #dcf8c6;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        .ai-bubble {
+            background-color: #f1f0f0;
+            align-self: flex-start;
+        }
+        .loading-dots span {
+            animation: blink 1.4s infinite both;
+        }
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes blink {
+            0%, 80%, 100% { opacity: 0; }
+            40% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-amber-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-stone-800 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <h1 class="text-3xl font-bold text-amber-300">組曲「展覧会の絵」鑑賞ナビ</h1>
+            <p class="text-sm mt-1">ムソルグスキー作曲 / ラヴェル編曲</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-8">
+
+        <!-- Introduction -->
+        <section class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-2xl font-bold text-stone-700 mb-4 border-b-4 border-amber-300 pb-2">ようこそ！「展覧会の絵」の世界へ</h2>
+            <p class="mb-4">この組曲は、ロシアの作曲家モデスト・ムソルグスキーが、亡くなった友人である画家ヴィクトル・ハルトマンの遺作展を訪れた際に着想を得て作曲したピアノ曲です。展覧会で見た10枚の絵の印象が、それぞれ独立した曲になっています。</p>
+            <p class="mb-4">今回は、フランスの作曲家モーリス・ラヴェルがオーケストラ用に編曲したバージョンを聴いていきましょう。ラヴェルは「管弦楽の魔術師」とも呼ばれ、様々な楽器の音色を巧みに使い分けることで、原曲の魅力をさらに引き出しています。</p>
+            <p>各楽章のタイトルをクリックして、解説・絵画・音楽を楽しみましょう！</p>
+        </section>
+
+        <!-- Movements Accordion -->
+        <div id="movements-accordion" class="space-y-4">
+            <!-- 各楽章のデータはJavaScriptで生成 -->
+        </div>
+
+        <!-- AI Chatbot Section -->
+        <section id="chatbot" class="mt-12 bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold text-stone-700 mb-4 border-b-4 border-amber-300 pb-2">AIアシスタントに質問しよう！</h2>
+            <p class="mb-4">「展覧会の絵」について、もっと知りたいことはありませんか？下のボックスに質問を入力してみてください。（例：「プロムナードってどういう意味？」「一番有名な曲は？」）</p>
+            
+            <div id="chat-window" class="h-80 border border-gray-300 rounded-lg p-4 overflow-y-auto mb-4 bg-gray-50 flex flex-col">
+                <div class="ai-bubble">こんにちは！組曲「展覧会の絵」について、何でも聞いてくださいね。</div>
+            </div>
+
+            <div id="chat-input-container" class="flex gap-2">
+                <input type="text" id="chat-input" class="flex-grow border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-amber-400" placeholder="質問を入力してください...">
+                <button id="chat-submit" class="bg-stone-700 text-white font-bold py-2 px-6 rounded-lg hover:bg-stone-600 transition-colors disabled:bg-gray-400">
+                    送信
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const movements = [
+                {
+                    title: 'プロムナード Promenade',
+                    description: '展覧会の絵を見て回る作曲者自身の足取りを表すテーマです。このメロディは曲中で何度も形を変えて現れます。',
+                    analysis: 'トランペットのファンファーレのような輝かしいメロディで始まります。このメロディは、展覧会を歩き回る作曲者自身の姿を表しており、力強く、少し不規則なリズムが歩いている様子を感じさせます。オーケストラの様々な楽器で演奏され、絵から絵へと移動するときの気分を表現しています。',
+                    questions: [
+                        'このメロディを聴いて、どんな場所を歩いているイメージが湧きますか？',
+                        '歩く速さはどれくらいだと思いますか？速い？遅い？'
+                    ],
+                    videoId: 'B4I52UodG4Y', start: 0, imageUrl: null
+                },
+                {
+                    title: '第1曲：小人（グノームス）Gnomus',
+                    description: '手足を不器用に動かす、奇怪なデザインのくるみ割り人形の絵がもとになっています。',
+                    analysis: '低音楽器のうごめくような音と、急に鳴り響く不協和音が特徴です。音楽は頻繁に停止したり、急に速くなったりと、予測不可能な動きをします。これは、グロテスクで不器用な小人の動きを音楽で表現しているためです。',
+                    questions: [
+                        'この曲のどこに「小人っぽさ」を感じますか？',
+                        '音楽が急に止まったり動いたりするのは、小人が何をしている様子だと思いますか？'
+                    ],
+                    videoId: 'B4I52UodG4Y', start: 95, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/93/Hartmann_-_Gnomus.jpg'
+                },
+                {
+                    title: 'プロムナード',
+                    description: '少し落ち着いた雰囲気のプロムナード。次の絵への期待感を感じさせます。',
+                    analysis: 'ホルンと木管楽器が、より穏やかで思索的な雰囲気のプロムナードを奏でます。最初のプロムナードと比べると、静かで内面的な気持ちを表しているようです。',
+                    questions: [
+                        '最初のプロムナードと比べて、どんな気持ちの変化があったと思いますか？',
+                        '次はどんな絵が待っていると想像しますか？'
+                    ],
+                    videoId: 'B4I52UodG4Y', start: 243, imageUrl: null
+                },
+                {
+                    title: '第2曲：古城 Il vecchio castello',
+                    description: '中世イタリアの古城の前で、吟遊詩人が歌をうたっている様子が描かれています。',
+                    analysis: '物悲しいアルト・サクソフォーンのソロが、中世の吟遊詩人の歌を表現しています。背景では、ファゴットと弦楽器の低音が一定のリズムを刻み、古城の静かで変わらない雰囲気を醸し出しています。全体的に静かで、寂しさを感じる曲です。',
+                    questions: [
+                        'アルト・サクソフォーンの音色は、どんな気持ちを表していると思いますか？',
+                        'もしこのお城に住んでいるとしたら、どんな一日を過ごすと思いますか？'
+                    ],
+                    videoId: 'B4I52UodG4Y', start: 296, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/30/Hartmann_-_Il_vecchio_castello.jpg'
+                },
+                {
+                    title: 'プロムナード',
+                    description: '力強く、堂々としたプロムナード。',
+                    analysis: 'トランペットとオーケストラ全体が、力強く堂々としたプロムナードを演奏します。これまでの静かな雰囲気から一転し、気持ちを新たにして次の絵に向かう様子がうかがえます。',
+                    questions: [ 'このプロムナードから、作曲者はどんな気持ちになったと思いますか？' ],
+                    videoId: 'B4I52UodG4Y', start: 423, imageUrl: null
+                },
+                {
+                    title: '第3曲：テュイルリーの庭 Tuileries',
+                    description: 'パリにある公園で、子供たちが遊びまわり、乳母たちが噂話に花を咲かせている情景です。',
+                    analysis: '木管楽器が軽快なリズムで、子供たちがはしゃぎ回る様子を描写します。短いメロディが繰り返され、まるで子供たちの「遊ぼうよ！」という呼びかけのようです。中間部では、少し落ち着いたメロディで乳母たちのおしゃべりを表現しています。',
+                    questions: [
+                        'この曲を聴いて、公園のどんな遊具で遊んでいる様子が目に浮かびますか？',
+                        '曲の速さやリズムは、子供たちのどんな動きを表していると思いますか？'
+                    ],
+                    videoId: 'B4I52UodG4Y', start: 451, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b8/Hartmann_-_Tuileries.jpg'
+                },
+                {
+                    title: '第4曲：ビドロ Bydło',
+                    description: '「ビドロ」とはポーランド語で「牛車」のこと。重い荷物を積んだ牛車が、大きな車輪をきしませながらゆっくりと近づき、やがて遠ざかっていく様子が描かれています。',
+                    analysis: 'チューバなどの低音楽器が、重々しい牛車のテーマを演奏します。曲はピアニッシモ（とても弱く）から始まり、だんだんと強く（クレッシェンド）なって、牛車が近づいてくる様子を表します。頂点を過ぎると、今度はだんだん弱く（デクレッシェンド）なり、遠ざかっていく様子を見事に描いています。',
+                    questions: [
+                        '牛車は、何を運んでいると思いますか？',
+                        '音が一番大きくなるのは、牛車がどこにいる時だと思いますか？'
+                    ],
+                    videoId: 'B4I52UodG4Y', start: 513, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Hartmann_-_Bydlo.jpg'
+                },
+                 {
+                    title: 'プロムナード',
+                    description: '静かで瞑想的なプロムナード。光が差し込むような雰囲気です。',
+                    analysis: '木管楽器が静かにプロムナードのメロディを奏でます。重々しい「ビドロ」の後で、心が浄化されるような、穏やかで美しい響きです。',
+                    questions: [ '重い牛車の絵を見た後で、なぜこのような静かなプロムナードが来るのだと思いますか？' ],
+                    videoId: 'B4I52UodG4Y', start: 660, imageUrl: null
+                },
+                {
+                    title: '第5曲：卵の殻をつけた雛の踊り',
+                    description: 'バレエ「トリルビ」のために描かれた衣装デザインがもとになっています。卵の殻をかぶった雛たちが、ぴょこぴょこと踊る様子がコミカルに描かれています。',
+                    analysis: 'オーボエやフルートなどの高音楽器が、素早く可愛らしいメロディを演奏します。ピチカート（弦を指ではじく奏法）やトリル（音を細かく震わせる奏法）が、雛たちがぴょこぴょこ跳ねたり、くちばしで殻をつついたりする様子を表現しています。',
+                    questions: [
+                        '雛たちは、どんなダンスを踊っていると思いますか？自由に想像して発表してみよう。',
+                        '音楽のどの部分が、卵の殻を表現しているように聞こえますか？'
+                    ],
+                    videoId: 'B4I52UodG4Y', start: 702, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d2/Hartmann_-_Ballet_of_the_Unhatched_Chicks.jpg'
+                },
+                {
+                    title: '第6曲：サムエル・ゴールデンベルクとシュムイレ',
+                    description: 'モデルはハルトマンが描いた2人のユダヤ人。威張り散らす金持ちのサムエルと、貧乏で気の弱いシュムイレの対照的な性格が巧みに表現されています。',
+                    analysis: '２つの対照的なメロディが登場します。一つは、弦楽器全体で演奏される、重々しく威張ったようなメロディ（金持ちのゴールデンベルク）。もう一つは、弱音器をつけたトランペットによる、甲高くおどおどしたようなメロディ（貧乏なシュムイレ）。この２つが同時に演奏される部分もあり、会話の様子を見事に描いています。',
+                    questions: [
+                        '二人の会話は、うまくいっていると思いますか？それとも、喧嘩しているように聞こえますか？',
+                        'もし自分がシュムイレだったら、ゴールデンベルクに何を話しますか？'
+                    ],
+                    videoId: 'B4I52UodG4Y', start: 778, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Hartmann_-_Samuel_Goldenberg_und_Schmuyle.jpg'
+                },
+                {
+                    title: '第7曲：リモージュの市場',
+                    description: 'フランスの街リモージュの市場で、女性たちがやかましくおしゃべりをしている様子が描かれています。',
+                    analysis: '弦楽器と木管楽器が、非常に速いパッセージを絶え間なく演奏し続けます。特定のメロディというよりは、たくさんの人々が一度にしゃべっているような、市場の喧騒そのものを音で表現しています。音楽は一切途切れることなく、次の「カタコンベ」へと繋がっていきます。',
+                    questions: [
+                        '市場では、どんなものが売られていると思いますか？',
+                        'この音楽の速さや音量から、市場の活気をどのくらい感じますか？'
+                    ],
+                    videoId: 'B4I52UodG4Y', start: 910, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/Hartmann_-_Limoges.jpg'
+                },
+                {
+                    title: '第8曲：カタコンベ（ローマの墓）',
+                    description: 'ハルトマンがランプを片手に、パリの地下墓地（カタコンベ）を探検している自画像がもとになっています。後半は「死せる言葉による死者への呼びかけ」。',
+                    analysis: '金管楽器の重々しい和音が、暗く不気味な地下墓地の雰囲気を表現しています。音の響きが長く、静寂と緊張感が漂います。「死せる言葉による死者への呼びかけ」では、プロムナードのテーマが短調になり、震えるような弦楽器のトレモロの上で、悲しげに演奏されます。',
+                    questions: [
+                        'この地下墓地は、どんな場所だと思いますか？（怖い、神聖、静かなど）',
+                        'プロムナードのテーマが、ここではどのように聞こえますか？最初のプロムナードと比べてみましょう。'
+                    ],
+                    videoId: 'B4I52UodG4Y', start: 992, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c5/Hartmann_-_Catacombae.jpg'
+                },
+                {
+                    title: '第9曲：鶏の足の上の小屋（バーバ・ヤーガ）',
+                    description: 'ロシアの民話に登場する魔女「バーバ・ヤーガ」が住む、鶏の足の上に建つ小屋が描かれています。',
+                    analysis: '全オーケストラによる激しい強打と、荒々しいリズムが特徴です。低音楽器が不気味なメロディを奏で、魔女バーバ・ヤーガの恐ろしさを表現します。中間部では一時的に静かになりますが、すぐにまた激しい音楽に戻り、魔女が空を飛び回るような疾走感を生み出しています。',
+                    questions: [
+                        'この音楽を聴いて、魔女バーバ・ヤーガはどんな姿をしていると想像しますか？',
+                        '音楽の速さや強さの変化は、物語のどんな場面を表していると思いますか？'
+                    ],
+                    videoId: 'AWhtACNkCU0', start: 0, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/86/Hartmann_-_The_Hut_on_Fowl%27s_Legs.jpg'
+                },
+                {
+                    title: '第10曲：キエフの大門',
+                    description: '古代ロシア様式でデザインされた、キエフの都の城門の設計図がもとになっています。',
+                    analysis: 'プロムナードのテーマが、荘厳で堂々とした形で再現されます。鐘の音を模倣した壮大な響きや、ロシア正教の聖歌のような敬虔なメロディが加わり、キエフの都の栄光と偉大さを表現しています。最後は全オーケストラが一体となって、輝かしいクライマックスを築き上げます。',
+                    questions: [
+                        'この門をくぐるとき、どんな気持ちになりますか？',
+                        'これまでの楽章と比べて、この曲の「プロムナード」のテーマはどんな風に聞こえますか？'
+                    ],
+                    videoId: 'B4I52UodG4Y', start: 1418, imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Hartmann_-_The_Great_Gate_of_Kiev.jpg'
+                }
+            ];
+
+            const accordionContainer = document.getElementById('movements-accordion');
+            let players = [];
+            let isYouTubeApiReady = false;
+
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            
+            window.onYouTubeIframeAPIReady = function() {
+                isYouTubeApiReady = true;
+            };
+
+            movements.forEach((movement, index) => {
+                const item = document.createElement('div');
+                item.className = 'border border-stone-300 rounded-lg bg-white shadow';
+
+                const header = document.createElement('button');
+                header.className = 'w-full text-left p-4 font-bold text-lg text-stone-700 bg-amber-100 hover:bg-amber-200 transition-colors flex justify-between items-center rounded-t-lg';
+                header.innerHTML = `<span>${movement.title}</span><span class="plus-icon text-2xl font-light">+</span>`;
+                
+                const content = document.createElement('div');
+                content.className = 'accordion-content';
+
+                const contentWrapper = document.createElement('div');
+                contentWrapper.className = 'p-4 md:p-6 border-t border-stone-200 space-y-6';
+                
+                // Description
+                const description = document.createElement('p');
+                description.className = 'text-base';
+                description.textContent = movement.description;
+                contentWrapper.appendChild(description);
+
+                // Analysis
+                const analysisContainer = document.createElement('div');
+                const analysisTitle = document.createElement('h3');
+                analysisTitle.className = 'text-lg font-bold text-stone-600 border-l-4 border-amber-400 pl-2 mb-2';
+                analysisTitle.textContent = '楽曲の分析';
+                const analysisText = document.createElement('p');
+                analysisText.className = 'text-base';
+                analysisText.textContent = movement.analysis;
+                analysisContainer.appendChild(analysisTitle);
+                analysisContainer.appendChild(analysisText);
+                contentWrapper.appendChild(analysisContainer);
+
+                // Image
+                if (movement.imageUrl) {
+                    const image = document.createElement('img');
+                    image.src = movement.imageUrl;
+                    image.alt = `[Image of ${movement.title}]`;
+                    image.className = 'w-full md:w-2/3 lg:w-1/2 mx-auto rounded-lg shadow-md my-4';
+                    image.onerror = () => { image.style.display='none'; };
+                    contentWrapper.appendChild(image);
+                }
+                
+                // Questions
+                const questionsContainer = document.createElement('div');
+                const questionsTitle = document.createElement('h3');
+                questionsTitle.className = 'text-lg font-bold text-stone-600 border-l-4 border-amber-400 pl-2 mb-2';
+                questionsTitle.textContent = '考えてみよう';
+                const questionsList = document.createElement('ul');
+                questionsList.className = 'list-disc list-inside space-y-1';
+                movement.questions.forEach(q => {
+                    const li = document.createElement('li');
+                    li.textContent = q;
+                    questionsList.appendChild(li);
+                });
+                questionsContainer.appendChild(questionsTitle);
+                questionsContainer.appendChild(questionsList);
+                contentWrapper.appendChild(questionsContainer);
+
+
+                // Video
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'youtube-embed rounded-md mt-6';
+                const videoDivId = `player-${index}`;
+                const videoDiv = document.createElement('div');
+                videoDiv.id = videoDivId;
+                videoContainer.appendChild(videoDiv);
+                contentWrapper.appendChild(videoContainer);
+
+                content.appendChild(contentWrapper);
+                item.appendChild(header);
+                item.appendChild(content);
+                accordionContainer.appendChild(item);
+
+                header.addEventListener('click', () => {
+                    const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+
+                    document.querySelectorAll('.accordion-content').forEach((el, i) => {
+                        if (el !== content) {
+                           el.style.maxHeight = null;
+                           el.previousElementSibling.querySelector('.plus-icon').textContent = '+';
+                           if (players[i] && typeof players[i].stopVideo === 'function') {
+                               players[i].stopVideo();
+                           }
+                        }
+                    });
+
+                    if (isOpen) {
+                        content.style.maxHeight = null;
+                        header.querySelector('.plus-icon').textContent = '+';
+                        if (players[index] && typeof players[index].stopVideo === 'function') {
+                            players[index].stopVideo();
+                        }
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        header.querySelector('.plus-icon').textContent = '-';
+                        
+                        if (isYouTubeApiReady) {
+                            if (players[index]) {
+                                players[index].seekTo(movement.start, true);
+                                players[index].playVideo();
+                            } else {
+                                players[index] = new YT.Player(videoDivId, {
+                                    height: '360',
+                                    width: '640',
+                                    videoId: movement.videoId,
+                                    playerVars: {
+                                        'playsinline': 1,
+                                        'autoplay': 1,
+                                        'start': movement.start
+                                    },
+                                    events: {
+                                        'onReady': (event) => {
+                                             event.target.playVideo();
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Chatbot functionality
+            const chatWindow = document.getElementById('chat-window');
+            const chatInput = document.getElementById('chat-input');
+            const chatSubmit = document.getElementById('chat-submit');
+            let chatHistory = [];
+            const initialPrompt = `あなたは親切で知識豊富な音楽の先生です。中学校の生徒に、組曲「展覧会の絵」について教えるという文脈で回答してください。回答は常に日本語で、専門用語は避け、分かりやすく、丁寧な言葉遣いを心がけてください。この組曲に関する質問にのみ答えてください。関係ない質問には、「『展覧会の絵』に関する質問をしてくださいね。」と答えてください。`;
+            chatHistory.push({ role: "system", parts: [{ text: initialPrompt }] });
+
+            const sendMessage = async () => {
+                const userMessage = chatInput.value.trim();
+                if (userMessage === '') return;
+
+                appendMessage(userMessage, 'user');
+                chatInput.value = '';
+                chatSubmit.disabled = true;
+                appendLoadingIndicator();
+
+                chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
+
+                try {
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; 
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    removeLoadingIndicator();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const aiMessage = result.candidates[0].content.parts[0].text;
+                        appendMessage(aiMessage, 'ai');
+                        chatHistory.push({ role: "model", parts: [{ text: aiMessage }] });
+                    } else {
+                       throw new Error("Invalid response structure from API.");
+                    }
+                } catch (error) {
+                    console.error('Error fetching AI response:', error);
+                    removeLoadingIndicator();
+                    appendMessage('申し訳ありません、エラーが発生しました。もう一度試してください。', 'ai');
+                } finally {
+                    chatSubmit.disabled = false;
+                    chatInput.focus();
+                }
+            };
+
+            const appendMessage = (message, sender) => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-bubble ${sender === 'user' ? 'user-bubble' : 'ai-bubble'}`;
+                messageDiv.textContent = message;
+                chatWindow.appendChild(messageDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            };
+
+            const appendLoadingIndicator = () => {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.id = 'loading-indicator';
+                loadingDiv.className = 'ai-bubble loading-dots';
+                loadingDiv.innerHTML = '<span>.</span><span>.</span><span>.</span>';
+                chatWindow.appendChild(loadingDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            };
+            
+            const removeLoadingIndicator = () => {
+                const indicator = document.getElementById('loading-indicator');
+                if(indicator) {
+                    indicator.remove();
+                }
+            };
+
+            chatSubmit.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
